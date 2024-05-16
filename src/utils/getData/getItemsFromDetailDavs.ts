@@ -2,6 +2,7 @@ import { MdAttachMoney } from "react-icons/md";
 import { truncateString } from "../mask/stringMask";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { IoIosPeople } from "react-icons/io";
+import { formatCurrency } from "./../mask/moneyMask";
 
 interface itemDav {
   ID_PSS: string;
@@ -38,19 +39,14 @@ export type listPorp = {
 
 export default function getItemFromDetailDavs({ listDav }: listPorp) {
   let formOfPayment = "";
-  let overdueStatus = "";
+  let netValue = 0;
   let personName = "";
 
   listDav.forEach((items) => {
     formOfPayment = items.FORMA_PAGAMENTO;
-    overdueStatus = items.ATRASO_RCB;
+    netValue += Number(items.VALOR_RCB.replace(",", "."));
     personName = items.NOME_PSS;
   });
-
-  const wasPaid =
-    parseInt(overdueStatus) < 0
-      ? `${overdueStatus} dias em atraso`
-      : "Foi pago";
 
   const infoDetaildCard = [
     {
@@ -60,8 +56,8 @@ export default function getItemFromDetailDavs({ listDav }: listPorp) {
     },
     {
       icon: MdAttachMoney,
-      title: "Status do pagamento",
-      value: wasPaid,
+      title: "Valor liquid",
+      value: formatCurrency(netValue),
     },
     {
       icon: IoIosPeople,
@@ -72,7 +68,7 @@ export default function getItemFromDetailDavs({ listDav }: listPorp) {
 
   return {
     formOfPayment,
-    overdueStatus,
+    netValue,
     personName,
     infoDetaildCard,
   };

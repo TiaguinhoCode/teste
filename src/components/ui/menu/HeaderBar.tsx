@@ -6,6 +6,9 @@ import { MenuProps, RouterColors } from "./SideBar";
 
 // Dados
 import routerColors from './../../../data/routerColors.json'
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
+import { truncateString } from "@/utils/mask/stringMask";
 
 export default function HeaderBar({ isOpen }: MenuProps) {
     const router = useRouter();
@@ -20,21 +23,21 @@ export default function HeaderBar({ isOpen }: MenuProps) {
     if (routeColor === "table") {
         bgColorClass = "bg-[#fa6602]";
     } else {
-        bgColorClass = "bg-[#fa6602]";
+        bgColorClass = "bg-blue-700";
     }
 
     const firstPart = router.pathname.split("/")[1];
     const secondPart = router.pathname.split("/")[2];
+    const { user } = useContext(AuthContext)
 
     return (
-        <div className="p-4 xl:ml-60 2xl:ml-80 ">
+        <div className="p-4 xl:ml-[19em] 2xl:ml-80">
             <nav className={`block w-full max-w-full ${bgColorClass} text-white shadow-none rounded-xl transition-all px-3 py-2 overflow-auto`}>
                 <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
                     <div className="capitalize">
                         <nav className="w-max">
                             <ol className="flex z-50 flex-wrap items-center w-full bg-opacity-60 rounded-md bg-transparent p-0 transition-all">
                                 <li className="flex items-center text-blue-gray-900 antialiased font-sans text-sm font-normal leading-normal cursor-pointer transition-colors duration-300 hover:text-light-blue-500">
-
                                     <p className="block antialiased leading-relaxed text-inherit capitalize font-sans text-sm leading-normal text-white font-normal  transition-all hover:font-bold ">
                                         dashboard
                                     </p>
@@ -50,9 +53,6 @@ export default function HeaderBar({ isOpen }: MenuProps) {
                                     <span className="text-white-500 text-sm antialiased font-sans font-normal leading-normal mx-2 pointer-events-none select-none">
                                         {secondPart && "/"}
                                     </span>
-                                    <p className="block antialiased font-sans text-sm leading-normal text-blue-white-900 font-normal">
-                                        {secondPart}
-                                    </p>
                                 </li>
                             </ol>
                         </nav>
@@ -133,7 +133,7 @@ export default function HeaderBar({ isOpen }: MenuProps) {
                                             clipRule="evenodd"
                                         ></path>
                                     </svg>
-                                    <p className="font-sans font-bold center text-white">Login</p>
+                                    <p className="font-sans font-bold center text-white">{truncateString(String(user?.username), 5)}</p>
                                 </button>
 
                                 <button
@@ -180,9 +180,6 @@ export default function HeaderBar({ isOpen }: MenuProps) {
                             </button>
 
                             <button
-                                aria-expanded="false"
-                                aria-haspopup="menu"
-                                id=":r2:"
                                 className="relative middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-white hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30"
                                 type="button"
                             >

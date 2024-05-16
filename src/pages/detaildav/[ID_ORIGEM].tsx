@@ -14,10 +14,9 @@ import { AuthTokenError } from "@/services/erros/AuthTokenError";
 import getItemFromDetailDavs from "@/utils/getData/getItemsFromDetailDavs";
 import SideBar from "@/components/ui/menu/SideBar";
 import HeaderBar from "@/components/ui/menu/HeaderBar";
-import InfoCards from "./../../components/ui/cards/InfoCards";
+import InfoCards from "@/components/ui/cards/InfoCards";
 import { Main } from "@/components/ui/mainComponents/main";
 import { GoSync } from "react-icons/go";
-
 import { TableProductDav } from "@/components/tables/TableDetailDav";
 import Link from "next/link";
 import { IoMdArrowBack } from "react-icons/io";
@@ -76,7 +75,6 @@ export type listPorp = {
 
 export default function DetailDav({ listDav, prodcutsDav }: listPorp) {
     const [toggleMenuClosed, setToggleMenuClosed] = useState(false);
-    const [animation, setAnimation] = useState<boolean>(false);
     const [itemsDavs, setItemsDavs] = useState(listDav || [])
     const [prodcutsDavs, setProdcutsDavs] = useState(prodcutsDav || [])
 
@@ -85,7 +83,7 @@ export default function DetailDav({ listDav, prodcutsDav }: listPorp) {
     const { ID_ORIGEM } = router.query;
 
     const { infoDetaildCard } = getItemFromDetailDavs({ listDav: itemsDavs })
-// console.log(infoDetaildCard)
+    
     return (
         <>
             <Head>
@@ -125,7 +123,6 @@ export default function DetailDav({ listDav, prodcutsDav }: listPorp) {
                             </div>
                         </div>
                         <div className="md:flex w-full">
-                            {/* <ItemsDavDetail listDav={itemsDavs} /> */}
                             <TableProductDav prodcutsDav={prodcutsDavs} />
                         </div>
                     </Main>

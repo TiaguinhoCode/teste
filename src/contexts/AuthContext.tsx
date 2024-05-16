@@ -1,11 +1,11 @@
 // React
-import { ReactNode, createContext, useState } from "react"
+import { ReactNode, createContext, useEffect, useState } from "react"
 
 // Services
 import { api } from "../services/apiClient";
 
 // Biblioteca
-import { destroyCookie, setCookie } from "nookies";
+import { destroyCookie, parseCookies, setCookie } from "nookies";
 import { toast } from "react-toastify";
 
 // Framework
@@ -13,9 +13,10 @@ import Router from "next/router";
 
 // Tipagem
 type AuthContextData = {
+    user: UserProps | undefined,
     isAuthenticated: boolean;
     signIn: (credentials: SignInProps) => Promise<void>;
-    // signOut: () => void;
+    signOut: () => void;
 }
 
 type UserProps = {
@@ -43,8 +44,25 @@ export function signOut() {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-    const [user, setUser] = useState<UserProps | undefined>(undefined);
+    const [user, setUser] = useState<UserProps>()
     const isAuthenticated = !!user;
+
+    useEffect(() => {
+        const { '@nextauth.token': token } = parseCookies();
+
+        async function loadUser() {
+            if (token) {
+                try {
+                    const resp = await api.post('/v1/auth/validate', { token: token });
+                    setUser(resp.data.returnObject.body);
+                } catch (err) {
+                    console.error("Erro ao validar token:", err);
+                    signOut(); // Token não for valido vou deslogar
+                }
+            }
+        }
+        loadUser();
+    }, []);
 
     async function signIn({ username, password }: SignInProps) {
         // console.log(`UserName: ${username}, Password: ${password}`)
@@ -63,15 +81,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 path: "/" // Quais caminhos terao acesso ao cookie
             })
 
-            setUser({
-                username
-            })
+            setUser({ username: username });
 
-            // console.log("Token: ", access_token)
+            // console.log("Token: ", user)
 
             api.defaults.headers['Authorization'] = `Bearer ${access_token}`
 
-            toast.success('Bem vindo!')
+            toast.success('Bem vindo!', {icon: <span>🚀</span>})
 
             Router.push('/')
         } catch (err) {
@@ -81,7 +97,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     // console.log("Usuario: ", user)
     return (
-        <AuthContext.Provider value={{ isAuthenticated, signIn }}>
+        <AuthContext.Provider value={{ user: user || { username: '' }, isAuthenticated, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     )
