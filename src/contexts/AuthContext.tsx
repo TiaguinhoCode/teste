@@ -1,103 +1,111 @@
-// React
-import { ReactNode, createContext, useEffect, useState } from "react"
-
-// Services
-import { api } from "../services/apiClient";
-
-// Biblioteca
-import { destroyCookie, parseCookies, setCookie } from "nookies";
-import { toast } from "react-toastify";
+'use client'
 
 // Framework
-import Router from "next/router";
+import { useRouter } from "next/navigation";
+
+// Biblioteca
+import { toast } from "react-toastify";
+import { setupApiClient } from "@/service/api";
+
+// React
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 // Tipagem
-type AuthContextData = {
-    user: UserProps | undefined,
-    isAuthenticated: boolean;
-    signIn: (credentials: SignInProps) => Promise<void>;
-    signOut: () => void;
-}
-
-type UserProps = {
-    username: string;
-}
-
 type SignInProps = {
     username: string;
     password: string;
 }
 
-type AuthProviderProps = {
-    children: ReactNode
+type AuthContextData = {
+    user: string;
+    role: string;
+    token: string;
+    signIn: (credentials: SignInProps) => Promise<void>;
+    signOut: () => void;
 }
 
-export const AuthContext = createContext({} as AuthContextData)
+export const AuthContext = createContext({} as AuthContextData);
 
-export function signOut() {
-    try {
-        destroyCookie(undefined, '@nextauth.token')
-        Router.push("/")
-    } catch (err) {
-        console.log('Error ao deslogar', err)
-    }
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
-    const [user, setUser] = useState<UserProps>()
-    const isAuthenticated = !!user;
+export function AuthProvider({ children }: { children: ReactNode }) {
+    const [userName, setUserName] = useState<string>("");
+    const [roleUser, setRoleUser] = useState<string>("");
+    const [token, setToken] = useState<string>("");
+    const api = setupApiClient();
+    const router = useRouter();
 
     useEffect(() => {
-        const { '@nextauth.token': token } = parseCookies();
+        const cookies = document.cookie.split('; ').reduce((prev, current) => {
+            const [name, ...rest] = current.split('=');
+            prev[name] = decodeURIComponent(rest.join('='));
+            return prev;
+        }, {} as Record<string, string>);
+
+        const token = cookies['@nextauth.token'];
+        const role = cookies['@nextauth.role'];
 
         async function loadUser() {
             if (token) {
                 try {
-                    const resp = await api.post('/v1/auth/validate', { token: token });
-                    setUser(resp.data.returnObject.body);
+                    const resp = await api.post('/v1/auth/validate', { token });
+                    setToken(token)
+                    setUserName(resp.data.returnObject.body.username as string);
+                    setRoleUser(role);
                 } catch (err) {
                     console.error("Erro ao validar token:", err);
-                    signOut(); // Token não for valido vou deslogar
+                    signOut();
                 }
             }
         }
+
         loadUser();
     }, []);
 
     async function signIn({ username, password }: SignInProps) {
-        // console.log(`UserName: ${username}, Password: ${password}`)
         try {
             const resp = await api.post('/v1/auth/login', {
                 username,
                 password
-            })
+            });
 
             const { access_token } = resp.data.returnObject.body;
+            const { role } = resp.data.returnObject.body.user;
 
-            // console.log("Token: ", access_token)
+            document.cookie = `@nextauth.token=${access_token}; max-age=${60 * 60 * 24 * 30}; path=/`;
+            document.cookie = `@nextauth.role=${role}; max-age=${60 * 60 * 24 * 30}; path=/`;
 
-            setCookie(undefined, '@nextauth.token', access_token, {
-                maxAge: 60 * 60 * 24 * 30, // Expirar em 1 mes
-                path: "/" // Quais caminhos terao acesso ao cookie
-            })
+            setUserName(username);
+            setRoleUser(role);
 
-            setUser({ username: username });
+            api.defaults.headers['Authorization'] = `Bearer ${access_token}`;
 
-            // console.log("Token: ", user)
 
-            api.defaults.headers['Authorization'] = `Bearer ${access_token}`
+            if (role === "vendedor") {
+                router.push('/sales');
+                toast.success(`Bem-vindo de volta, ${username}!`, { icon: <span>🚀</span> });
+            } else {
+                router.push('/davs');
+                toast.success(`Bem-vindo de volta, ${username}!`, { icon: <span>🚀</span> });
+            }
 
-            toast.success('Bem vindo!', {icon: <span>🚀</span>})
 
-            Router.push('/')
         } catch (err) {
-            toast.error("Erro ao acessar!")
-            console.log("Erro: ", err)
+            toast.error("Erro ao acessar!");
+            console.log("Error: ", err);
         }
     }
-    // console.log("Usuario: ", user)
+
+    function signOut() {
+        try {
+            document.cookie = '@nextauth.token=; max-age=0; path=/';
+            document.cookie = '@nextauth.role=; max-age=0; path=/';
+            router.push("/");
+        } catch (err) {
+            console.error("Error ao deslogar: ", err);
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ user: user || { username: '' }, isAuthenticated, signIn, signOut }}>
+        <AuthContext.Provider value={{ user: userName, role: roleUser, token: token, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     )
