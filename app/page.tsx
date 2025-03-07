@@ -13,6 +13,7 @@ import cardFino from "../public/Ultrafino.png"
 import Benefit from "@/components/benefit";
 import TypeOfCovers from "@/components/typeOfCovers";
 import Public from "@/components/public";
+import Bilings from "@/components/billings";
 
 export default function Home() {
   return (
@@ -73,7 +74,9 @@ export default function Home() {
       <Benefit />
       <TypeOfCovers />
       <Public />
+      <Bilings />
 
-    </main>
+      <div className="relative w-full h-[780px] flex flex-col"></div>
+    </main >
   );
 }

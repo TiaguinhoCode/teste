@@ -35,7 +35,7 @@ export default function Public() {
                     <div className="flex flex-col justify-center items-center pb-8">
                         <h2 className="pb-4 text-xl break-words max-w-full text-center">Estudantes</h2>
                         <Image
-                            className="w-[298px]  rounded-sm"
+                            className="w-[298px] rounded-sm"
                             src={estudante}
                             alt="fino"
                             quality={80}

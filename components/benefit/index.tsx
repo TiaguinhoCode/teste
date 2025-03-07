@@ -27,7 +27,7 @@ export default function Benefit() {
                     <p className="text-xl">no corpo no dia a dia. São eles:</p>
                 </div>
 
-                <div className="grid grid-cols-1 w-3/4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full justify-center items-center">
+                <div className="grid grid-cols-1 w-[78%] md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full justify-center items-center">
                     <div className="flex flex-col justify-center items-center pb-8">
                         <h2 className="pb-2 text-xl break-words max-w-full text-center">Ultra fino</h2>
                         <Image
