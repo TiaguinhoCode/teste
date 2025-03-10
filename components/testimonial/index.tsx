@@ -30,7 +30,7 @@ export default function Testimonial() {
                                 alt="Foto de usuário"
                             />
                             <div>
-                                <p className="text-white font-bold text-lg">Mike Baguncinha</p>
+                                <p className="text-white font-bold text-lg">Rafa</p>
                                 <div className="flex items-center">
                                     <div className="flex space-x-1">
                                         <FaStar className="text-yellow-400 text-lg" />
@@ -116,7 +116,7 @@ export default function Testimonial() {
                                 priority={true}
                             />
                             <div>
-                                <p className="text-white font-bold text-lg">PEPEU LENDA 11</p>
+                                <p className="text-white font-bold text-lg">Pedrinho</p>
                                 <div className="flex items-center">
                                     <div className="flex space-x-1">
                                         <FaStar className="text-yellow-400 text-lg" />
@@ -131,7 +131,7 @@ export default function Testimonial() {
                             </div>
                         </div>
                         <p className="mt-6 text-white text-base">
-                            "Vou te pegar, loirinho! Tu vai ver, vai ser uma"
+                            "Produto top, recomendo a todos que buscam inovação."
                         </p>
                     </div>
                 </div>
