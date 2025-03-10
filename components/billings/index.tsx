@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export default function Bilings() {
     return (
-        <div className="relative w-full h-auto flex flex-col">
+        <div className="relative w-full z-10 h-auto flex flex-col">
             <div className="absolute inset-0 bg-white"></div>
 
             <div className="absolute inset-0 flex justify-center py-12">
