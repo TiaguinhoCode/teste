@@ -36,19 +36,19 @@ export default function Home() {
             <div className="space-y-4">
               <div className="flex items-center justify-center md:justify-start space-x-2">
                 <FaCheckCircle className="text-green-500 text-2xl md:text-4xl" />
-                <p className="text-base sm:text-lg md:text-xl font-bold">
+                <p className="text-base sm:text-lg md:text-2xl font-light">
                   Tecnologia pioneira no Brasil
                 </p>
               </div>
               <div className="flex items-center justify-center md:justify-start space-x-2">
                 <FaCheckCircle className="text-green-500 text-2xl md:text-4xl" />
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold">
+                <p className="text-xl sm:text-2xl md:text-2xl font-light">
                   Alta margem de lucro
                 </p>
               </div>
               <div className="flex items-center justify-center md:justify-start space-x-2">
                 <FaCheckCircle className="text-green-500 text-2xl md:text-4xl" />
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold">
+                <p className="text-xl sm:text-2xl md:text-2xl font-light">
                   Fácil aplicação
                 </p>
               </div>

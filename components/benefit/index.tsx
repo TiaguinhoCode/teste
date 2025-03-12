@@ -8,10 +8,8 @@ import sensibilidadeTouch from "../../public/sensibilidadeTouch.png";
 export default function Benefit() {
     return (
         <div className="relative w-full min-h-screen flex flex-col">
-            {/* Fundo preto */}
             <div className="absolute inset-0 bg-black"></div>
 
-            {/* Texto de fundo "BENEFÍCIOS" */}
             <div className="absolute inset-0 flex justify-center py-10">
                 <span className="font-extrabold text-white opacity-10 text-4xl sm:text-6xl md:text-7xl lg:text-9xl">
                     BENEFÍCIOS
@@ -39,7 +37,7 @@ export default function Benefit() {
                 </div>
 
                 {/* Grid dos benefícios */}
-                <div className="grid grid-cols-1 w-full md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-center items-center px-4">
+                <div className="grid grid-cols-1 w-[80%] md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 justify-center items-center px-10">
                     {/* Cartão 1 */}
                     <div className="flex flex-col justify-center items-center pb-8">
                         <h2 className="pb-2 text-center text-lg md:text-xl">Ultra fino</h2>
@@ -48,7 +46,7 @@ export default function Benefit() {
                             src={cardFino}
                             alt="Ultra fino"
                             quality={80}
-                            priority={true}
+                            priority={true} 
                         />
                     </div>
 
