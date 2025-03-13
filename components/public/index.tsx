@@ -1,9 +1,11 @@
-import Image from "next/image";
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 
-import gamer from "../../public/gamer.png";
-import estudante from "../../public/estudante.png";
-import crianca from "../../public/crianca.png";
-import empresario from "../../public/empresario.png";
+// Imagens
+import gamer from '../../public/gamer.png';
+import estudante from '../../public/estudante.png';
+import crianca from '../../public/crianca.png';
+import empresario from '../../public/empresario.png';
 
 export default function Public() {
     return (
@@ -17,13 +19,25 @@ export default function Public() {
             </div>
 
             <div className="relative z-10 flex flex-col items-center py-12 md:py-24 h-full">
-                <h2 className="font-extrabold text-white text-3xl md:text-5xl pb-8 md:pb-20">
+                <motion.h2
+                    className="font-extrabold text-white text-3xl md:text-5xl pb-8 md:pb-20"
+                    initial={{ opacity: 0, y: -50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }} // dispara a animação quando 20% do elemento estiver visível
+                    transition={{ duration: 0.8 }}
+                >
                     Para quem você pode vender
-                </h2>
+                </motion.h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 justify-center items-center w-full px-4">
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-4 text-xl text-center">Gamers</h2>
+                    <motion.div
+                        className="flex flex-col justify-center items-center pb-8"
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h3 className="pb-4 text-xl text-center">Gamers</h3>
                         <Image
                             className="w-full max-w-[320px] rounded-sm"
                             src={gamer}
@@ -31,9 +45,15 @@ export default function Public() {
                             quality={80}
                             priority={true}
                         />
-                    </div>
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-4 text-xl text-center">Estudantes</h2>
+                    </motion.div>
+                    <motion.div
+                        className="flex flex-col justify-center items-center pb-8"
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                    >
+                        <h3 className="pb-4 text-xl text-center">Estudantes</h3>
                         <Image
                             className="w-full max-w-[320px] rounded-sm"
                             src={estudante}
@@ -41,9 +61,15 @@ export default function Public() {
                             quality={80}
                             priority={true}
                         />
-                    </div>
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-4 text-xl text-center">Crianças</h2>
+                    </motion.div>
+                    <motion.div
+                        className="flex flex-col justify-center items-center pb-8"
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                    >
+                        <h3 className="pb-4 text-xl text-center">Crianças</h3>
                         <Image
                             className="w-full max-w-[320px] rounded-sm"
                             src={crianca}
@@ -51,9 +77,15 @@ export default function Public() {
                             quality={80}
                             priority={true}
                         />
-                    </div>
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-4 text-xl text-center">Empresários</h2>
+                    </motion.div>
+                    <motion.div
+                        className="flex flex-col justify-center items-center pb-8"
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.8, delay: 0.6 }}
+                    >
+                        <h3 className="pb-4 text-xl text-center">Empresários</h3>
                         <Image
                             className="w-full max-w-[320px] rounded-sm"
                             src={empresario}
@@ -61,7 +93,7 @@ export default function Public() {
                             quality={80}
                             priority={true}
                         />
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </div>

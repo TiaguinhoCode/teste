@@ -1,3 +1,6 @@
+// Biblioteca
+import { AnimatePresence, motion } from 'framer-motion';
+
 export default function TypeOfCovers() {
     return (
         <div className="relative w-full h-auto min-h-[750px] flex flex-col">
@@ -20,31 +23,47 @@ export default function TypeOfCovers() {
                     </p>
 
                     <div className="flex flex-col md:flex-row w-full space-y-8 md:space-y-0 md:space-x-10 justify-center items-center">
-                        <div className="flex w-full md:w-[32%] justify-center items-center relative">
-                            <div className="w-full">
-                                <iframe
-                                    className="w-full aspect-video border rounded-lg border-gray-500"
-                                    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                                    title="YouTube video player"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
-                            </div>
-                        </div>
+                        <AnimatePresence>
+                            <motion.div
+                                key="video1"
+                                initial={{ opacity: 0, x: -100 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 100 }}
+                                transition={{ duration: 0.5 }}
+                                className="flex w-full md:w-[32%] justify-center items-center relative"
+                            >
+                                <div className="w-full">
+                                    <iframe
+                                        className="w-full aspect-video border rounded-lg border-gray-500"
+                                        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                                        title="YouTube video player"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    ></iframe>
+                                </div>
+                            </motion.div>
 
-                        <div className="flex w-full md:w-[32%] justify-center items-center relative">
-                            <div className="w-full">
-                                <iframe
-                                    className="w-full aspect-video border rounded-lg border-gray-500"
-                                    src="https://www.youtube.com/embed/0-7IHOXkiV8"
-                                    title="YouTube video player"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
-                            </div>
-                        </div>
+                            <motion.div
+                                key="video2"
+                                initial={{ opacity: 0, x: -100 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 100 }}
+                                transition={{ duration: 0.5 }}
+                                className="flex w-full md:w-[32%] justify-center items-center relative"
+                            >
+                                <div className="w-full">
+                                    <iframe
+                                        className="w-full aspect-video border rounded-lg border-gray-500"
+                                        src="https://www.youtube.com/embed/0-7IHOXkiV8"
+                                        title="YouTube video player"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    ></iframe>
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>

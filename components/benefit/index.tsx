@@ -1,4 +1,7 @@
-import Image from "next/image";
+import { motion } from 'framer-motion';
+import { TiltCard } from "../tileCard";
+
+// Images
 import cardFino from "../../public/Ultrafino.png";
 import antiOleosidade from "../../public/AntiOleosidade.png";
 import antiImpacto from "../../public/antiImpacto.png";
@@ -17,12 +20,12 @@ export default function Benefit() {
             </div>
 
             <div className="relative z-10 flex flex-col items-center py-10 md:py-20 min-h-screen">
-                {/* Título principal */}
-                <h2 className="font-extrabold text-white text-3xl md:text-4xl lg:text-5xl pb-8 md:pb-16">
+                {/* Title */}
+                <h2 className="font-extrabold text-white text-2xl md:text-4xl lg:text-5xl pb-8 md:pb-16">
                     CONFIRA CADA VANTAGEM
                 </h2>
 
-                {/* Descrição */}
+                {/* Description */}
                 <div className="w-full flex flex-col items-center justify-center pb-8 md:pb-20 px-4">
                     <p className="text-center text-base md:text-xl">
                         Nossos testes em laboratório e comprovados por nossos usuários mostraram{" "}
@@ -36,74 +39,27 @@ export default function Benefit() {
                     </p>
                 </div>
 
-                {/* Grid dos benefícios */}
-                <div className="grid grid-cols-1 w-[80%] md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 justify-center items-center px-10">
-                    {/* Cartão 1 */}
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-2 text-center text-lg md:text-xl">Ultra fino</h2>
-                        <Image
-                            className="w-[200px] md:w-[228px] h-auto rounded-sm"
-                            src={cardFino}
-                            alt="Ultra fino"
-                            quality={80}
-                            priority={true} 
-                        />
-                    </div>
-
-                    {/* Cartão 2 */}
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-2 text-center text-lg md:text-xl">
-                            Anti <span>Oleosidade</span>
-                        </h2>
-                        <Image
-                            className="w-[200px] md:w-[228px] h-auto rounded-sm"
-                            src={antiOleosidade}
-                            alt="Anti Oleosidade"
-                            quality={80}
-                            priority={true}
-                        />
-                    </div>
-
-                    {/* Cartão 3 */}
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-2 text-center text-lg md:text-xl">Anti-Impacto</h2>
-                        <Image
-                            className="w-[200px] md:w-[228px] h-auto rounded-sm"
-                            src={antiImpacto}
-                            alt="Anti Impacto"
-                            quality={80}
-                            priority={true}
-                        />
-                    </div>
-
-                    {/* Cartão 4 */}
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-2 text-center text-lg md:text-xl">
-                            Resistente a <span>riscos</span>
-                        </h2>
-                        <Image
-                            className="w-[200px] md:w-[228px] h-auto rounded-sm"
-                            src={resistenteARisco}
-                            alt="Resistente a Riscos"
-                            quality={80}
-                            priority={true}
-                        />
-                    </div>
-
-                    {/* Cartão 5 */}
-                    <div className="flex flex-col justify-center items-center pb-8">
-                        <h2 className="pb-2 text-center text-lg md:text-xl">
-                            Sensibilidade <span>Touch Original</span>
-                        </h2>
-                        <Image
-                            className="w-[200px] md:w-[228px] h-auto rounded-sm"
-                            src={sensibilidadeTouch}
-                            alt="Sensibilidade Touch Original"
-                            quality={80}
-                            priority={true}
-                        />
-                    </div>
-                </div>
+                {/* Cards */}
+                <motion.div
+                    className="grid grid-cols-1 lg:w-[80%] md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 justify-center items-center px-10"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                            opacity: 1,
+                            transition: {
+                                staggerChildren: 0.2, // Controls delay between cards
+                            },
+                        },
+                    }}
+                >
+                    <TiltCard title="Ultra fino" imageSrc={cardFino} altText="Ultra fino" />
+                    <TiltCard title="Anti Oleosidade" imageSrc={antiOleosidade} altText="Anti Oleosidade" />
+                    <TiltCard title="Anti-Impacto" imageSrc={antiImpacto} altText="Anti Impacto" />
+                    <TiltCard title="Resistente a riscos" imageSrc={resistenteARisco} altText="Resistente a Riscos" />
+                    <TiltCard title="Sensibilidade Touch Original" imageSrc={sensibilidadeTouch} altText="Sensibilidade Touch Original" />
+                </motion.div>
             </div>
         </div>
     );

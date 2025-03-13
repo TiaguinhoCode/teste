@@ -1,17 +1,26 @@
 'use client'
 
+// Biblioteca
 import { FaStar } from "react-icons/fa";
+
+// Imagem
 import Image from "next/image";
 import pepeu from "../../public/peu.jpeg";
+
+// Biblioteca
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
-import "swiper/css";
-import "swiper/css/pagination";
+import { Autoplay, Pagination } from 'swiper/modules';
+import { motion } from 'framer-motion';
 
 export default function Testimonial() {
     return (
-        <div className="relative w-full h-auto flex flex-col">
-            {/* Camada de fundo com degradê */}
+        <motion.div
+            initial={{ opacity: 0, y: 100 }} // Começa invisível e deslocado para baixo
+            whileInView={{ opacity: 1, y: 0 }} // Anima quando aparece na tela
+            transition={{ duration: 0.8, ease: "easeOut" }} // Suaviza a transição
+            viewport={{ once: true, amount: 0.3 }} // Só ativa uma vez quando 30% do componente estiver visível
+            className="relative w-full h-auto flex flex-col"
+        >
             <div className="absolute inset-0 bg-gradient-to-b from-[#000000] to-[#656565]"></div>
 
             <div className="absolute inset-0 flex justify-center py-12">
@@ -26,10 +35,12 @@ export default function Testimonial() {
                 </div>
 
                 <Swiper
-                    modules={[Pagination]}
+                    modules={[Pagination, Autoplay]}
                     spaceBetween={10}
                     slidesPerView={1}
                     pagination={{ clickable: true }}
+                    effect="fade" // Adiciona transição suave entre os slides
+                    autoplay={{ delay: 3000, disableOnInteraction: false }} // Faz os slides passarem automaticamente
                     breakpoints={{
                         640: { slidesPerView: 1 },
                         768: { slidesPerView: 3 },
@@ -38,13 +49,14 @@ export default function Testimonial() {
                     className="w-[95%] px-4 sm:px-10"
                 >
                     <SwiperSlide>
-                        <div className="bg-[#202124] p-10 sm:p-8 lg:p-20 rounded-lg shadow-lg flex flex-col h-full justify-between min-h-[200px]">
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="bg-[#202124] p-10 sm:p-8 lg:p-20 rounded-lg shadow-lg flex flex-col h-full justify-between min-h-[200px]"
+                        >
                             <div className="flex items-center space-x-4">
-                                <Image
-                                    className="w-20 h-20 rounded-full object-cover"
-                                    src={pepeu}
-                                    alt="Foto de usuário"
-                                />
+                                <Image className="w-20 h-20 rounded-full object-cover" src={pepeu} alt="Foto de usuário" />
                                 <div>
                                     <p className="text-white font-bold text-lg">Peu</p>
                                     <div className="flex flex-col gap-1">
@@ -65,7 +77,7 @@ export default function Testimonial() {
                             <p className="text-white text-xl">
                                 "Melhor loja, atendimento impecável. Venham conhecer aqui várias novidades e promoções.”
                             </p>
-                        </div>
+                        </motion.div>
                     </SwiperSlide>
 
                     <SwiperSlide>
@@ -165,6 +177,6 @@ export default function Testimonial() {
 
                 </Swiper>
             </div>
-        </div>
+        </motion.div>
     );
 }

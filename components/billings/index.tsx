@@ -1,7 +1,11 @@
+// Bibliotecas
 import { FaCheckCircle } from "react-icons/fa";
 
+// Imagens
 import dinheiro from "../../public/dinheiro.png"
 import dinheiroDesfocado from "../../public/dinheiroDesfocado.png"
+
+// Next
 import Image from "next/image";
 
 export default function Bilings() {
