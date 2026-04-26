@@ -146,6 +146,38 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
+    /* Permissions badge list */
+    .scopes-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+    }
+
+    .scopes-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 0.5rem;
+    }
+
+    .scope-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(24,119,242,0.1);
+      border: 0.5px solid rgba(24,119,242,0.3);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: #60a5fa;
+    }
+
+    .scope-badge svg {
+      width: 10px; height: 10px; fill: #60a5fa; flex-shrink: 0;
+    }
+
     .btn-connect {
       width: 100%; background: var(--accent); color: white; border: none;
       border-radius: 10px; padding: 14px;
@@ -265,6 +297,25 @@
     </div>
   </div>
 
+  <!-- Permissions badges -->
+  <div class="scopes-card">
+    <div class="card-title">Permissões OAuth solicitadas</div>
+    <div class="scopes-list">
+      <span class="scope-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        business_management
+      </span>
+      <span class="scope-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        whatsapp_business_management
+      </span>
+      <span class="scope-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        whatsapp_business_messaging
+      </span>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">Dados da Conexão</div>
 
@@ -329,14 +380,22 @@
 <script>
   var DEFAULT_APP_ID    = '960439420062430';
   var DEFAULT_CONFIG_ID = '977458031900449';
-  // redirect_uri = raiz do ngrok, igual ao que está cadastrado na Meta
   var DEFAULT_REDIRECT  = 'https://kamala-driveable-overfavorably.ngrok-free.dev/oauth/callback';
+
+  // ── Permissões OAuth ──────────────────────────────────────────────────────
+  var OAUTH_SCOPES = [
+    'business_management',
+    'whatsapp_business_management',
+    'whatsapp_business_messaging'
+  ].join(',');
+
+  var OAUTH_STATE  = 'meta-oauth';
+  // ─────────────────────────────────────────────────────────────────────────
 
   var popupWatcher = null;
 
   // ── Se esta página foi aberta pela Meta como callback (tem ?code= na URL),
-  //    envia o code para o opener e fecha. Isso funciona quando o redirect_uri
-  //    aponta para a raiz e este mesmo arquivo está servido nela.
+  //    envia o code para o opener e fecha.
   (function handleCallback() {
     var params = new URLSearchParams(window.location.search);
     var code   = params.get('code');
@@ -355,7 +414,6 @@
         window.opener.postMessage({ code: code }, '*');
         window.close();
       } else {
-        // Fallback: sem opener (aba nova), exibe o code na tela
         document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('resultCode').textContent = code;
           document.getElementById('resultBox').classList.add('show');
@@ -373,6 +431,7 @@
     refreshChips();
     setStep(1);
     log('Pronto. Preencha os campos e clique em Conectar.', 'info');
+    log('Scopes: ' + OAUTH_SCOPES, 'info');
   })();
 
   function launchMetaSignup() {
@@ -388,26 +447,31 @@
       return;
     }
 
-    // Guarda no sessionStorage para o sendToApi após o postMessage
     sessionStorage.setItem('oauth_apiUrl',      apiUrl);
     sessionStorage.setItem('oauth_workspaceId', workspaceId);
     sessionStorage.setItem('oauth_channelName', channelName);
 
+    // ── Monta URL OAuth com scope e state ────────────────────────────────
     var params = new URLSearchParams({
-      client_id                     : appId,
-      config_id                     : configId,
-      response_type                 : 'code',
+      client_id     : appId,
+      redirect_uri  : redirectUri,
+      response_type : 'code',
+      scope         : OAUTH_SCOPES,
+      state         : OAUTH_STATE,
+      config_id     : configId,
       override_default_response_type: 'true',
-      redirect_uri                  : redirectUri,
-      extras                        : JSON.stringify({ setup: {}, sessionInfoVersion: '3' })
+      extras        : JSON.stringify({ setup: {}, sessionInfoVersion: '3' })
     });
 
     var oauthUrl = 'https://www.facebook.com/v25.0/dialog/oauth?' + params.toString();
+    // ────────────────────────────────────────────────────────────────────
 
     log('Abrindo popup OAuth...', 'info');
     log('App ID: ' + appId, 'info');
     log('Config ID: ' + configId, 'info');
     log('Redirect URI: ' + redirectUri, 'info');
+    log('Scopes: ' + OAUTH_SCOPES, 'info');
+    log('State: ' + OAUTH_STATE, 'info');
     setStatus('loading', 'Aguardando autorização na janela Meta...');
     setStep(2);
 
@@ -442,7 +506,6 @@
       document.getElementById('resultCode').textContent = code;
       document.getElementById('resultBox').classList.add('show');
 
-      // Recupera os dados salvos antes do popup
       var savedApiUrl      = sessionStorage.getItem('oauth_apiUrl')      || apiUrl;
       var savedWorkspaceId = sessionStorage.getItem('oauth_workspaceId') || workspaceId;
       var savedChannelName = sessionStorage.getItem('oauth_channelName') || channelName;
@@ -503,7 +566,7 @@
   function getVal(id) { return document.getElementById(id).value.trim(); }
 
   function setStatus(type, msg) {
-    document.getElementById('sdkDot').className    = 'status-dot ' + type;
+    document.getElementById('sdkDot').className      = 'status-dot ' + type;
     document.getElementById('sdkStatus').textContent = msg;
   }
 
@@ -539,9 +602,3 @@
 
 </body>
 </html>
-<!-- 
-const META_APP_ID = '960439420062430';
-    const META_CONFIG_ID = 'abde37867814e98755d4a67ad17123cd';about:blank#blocked
-    const META_REDIRECT_URI = 'https://kamala-driveable-overfavorably.ngrok-free.dev'; 
-    1584720892632013
-    -->
