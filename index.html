@@ -377,6 +377,7 @@
 
 </div>
 
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 <script>
   var DEFAULT_APP_ID    = '960439420062430';
   var DEFAULT_CONFIG_ID = '977458031900449';
@@ -394,6 +395,11 @@
 
   var popupWatcher = null;
   var signupSessionInfo = {};
+  var facebookSdkReady = false;
+
+  window.fbAsyncInit = function() {
+    initFacebookSdk(DEFAULT_APP_ID);
+  };
 
   // ── Se esta página foi aberta pela Meta como callback (tem ?code= na URL),
   //    envia o code para o opener e fecha.
@@ -453,35 +459,19 @@
     sessionStorage.setItem('oauth_channelName', channelName);
     sessionStorage.setItem('oauth_redirectUri', redirectUri);
 
-    // ── Monta URL OAuth com scope e state ────────────────────────────────
-    var params = new URLSearchParams({
-      client_id     : appId,
-      redirect_uri  : redirectUri,
-      response_type : 'code',
-      scope         : OAUTH_SCOPES,
-      state         : OAUTH_STATE,
-      config_id     : configId,
-      override_default_response_type: 'true',
-      extras        : JSON.stringify({ setup: {}, sessionInfoVersion: '3' })
-    });
+    initFacebookSdk(appId);
 
-    var oauthUrl = 'https://www.facebook.com/v25.0/dialog/oauth?' + params.toString();
-    // ────────────────────────────────────────────────────────────────────
-
-    log('Abrindo popup OAuth...', 'info');
+    log('Abrindo Embedded Signup...', 'info');
     log('App ID: ' + appId, 'info');
     log('Config ID: ' + configId, 'info');
-    log('Redirect URI: ' + redirectUri, 'info');
     log('Scopes: ' + OAUTH_SCOPES, 'info');
     log('State: ' + OAUTH_STATE, 'info');
     setStatus('loading', 'Aguardando autorização na janela Meta...');
     setStep(2);
 
-    var popup = window.open(oauthUrl, 'MetaOAuth', 'width=620,height=720,scrollbars=yes');
-
-    if (!popup) {
-      log('ERRO: Popup bloqueado. Permita popups para esta página.', 'error');
-      setStatus('error', 'Popup bloqueado');
+    if (!window.FB || !facebookSdkReady) {
+      log('ERRO: SDK do Facebook ainda não carregou. Aguarde alguns segundos e tente novamente.', 'error');
+      setStatus('error', 'SDK não carregado');
       setStep(1);
       return;
     }
@@ -524,15 +514,49 @@
 
     window.addEventListener('message', onMessage);
 
-    popupWatcher = setInterval(function() {
-      if (popup.closed) {
-        clearInterval(popupWatcher);
-        window.removeEventListener('message', onMessage);
-        log('Popup fechado sem retornar code.', 'warn');
+    FB.login(function(response) {
+      window.removeEventListener('message', onMessage);
+
+      if (!response.authResponse || !response.authResponse.code) {
+        log('Embedded Signup finalizado sem authorization code.', 'warn');
         setStatus('ready', 'Pronto para tentar novamente');
         setStep(1);
+        return;
       }
-    }, 500);
+
+      var code = response.authResponse.code;
+      log('Authorization code recebido! (' + code.slice(0,12) + '...)', 'success');
+      document.getElementById('resultCode').textContent = code;
+      document.getElementById('resultBox').classList.add('show');
+
+      var savedApiUrl      = sessionStorage.getItem('oauth_apiUrl')      || apiUrl;
+      var savedWorkspaceId = sessionStorage.getItem('oauth_workspaceId') || workspaceId;
+      var savedChannelName = sessionStorage.getItem('oauth_channelName') || channelName;
+      var savedRedirectUri = sessionStorage.getItem('oauth_redirectUri') || redirectUri;
+
+      sendToApi(code, savedApiUrl, savedWorkspaceId, savedChannelName, savedRedirectUri, signupSessionInfo);
+    }, {
+      config_id: configId,
+      response_type: 'code',
+      override_default_response_type: true,
+      extras: {
+        setup: {},
+        sessionInfoVersion: '3'
+      }
+    });
+  }
+
+  function initFacebookSdk(appId) {
+    if (!window.FB) return;
+
+    FB.init({
+      appId: appId,
+      autoLogAppEvents: true,
+      xfbml: true,
+      version: 'v25.0'
+    });
+
+    facebookSdkReady = true;
   }
 
   function sendToApi(code, apiUrl, workspaceId, channelName, redirectUri, sessionInfo) {
