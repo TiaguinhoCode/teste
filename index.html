@@ -393,6 +393,7 @@
   // ─────────────────────────────────────────────────────────────────────────
 
   var popupWatcher = null;
+  var signupSessionInfo = {};
 
   // ── Se esta página foi aberta pela Meta como callback (tem ?code= na URL),
   //    envia o code para o opener e fecha.
@@ -450,6 +451,7 @@
     sessionStorage.setItem('oauth_apiUrl',      apiUrl);
     sessionStorage.setItem('oauth_workspaceId', workspaceId);
     sessionStorage.setItem('oauth_channelName', channelName);
+    sessionStorage.setItem('oauth_redirectUri', redirectUri);
 
     // ── Monta URL OAuth com scope e state ────────────────────────────────
     var params = new URLSearchParams({
@@ -487,6 +489,12 @@
     function onMessage(event) {
       if (!event.data) return;
 
+      var signupMessage = parseEmbeddedSignupMessage(event);
+      if (signupMessage) {
+        handleEmbeddedSignupMessage(signupMessage);
+        return;
+      }
+
       if (event.data.error) {
         log('Erro OAuth: ' + event.data.error, 'error');
         setStatus('error', 'Erro na autorização');
@@ -509,8 +517,9 @@
       var savedApiUrl      = sessionStorage.getItem('oauth_apiUrl')      || apiUrl;
       var savedWorkspaceId = sessionStorage.getItem('oauth_workspaceId') || workspaceId;
       var savedChannelName = sessionStorage.getItem('oauth_channelName') || channelName;
+      var savedRedirectUri = sessionStorage.getItem('oauth_redirectUri') || redirectUri;
 
-      sendToApi(code, savedApiUrl, savedWorkspaceId, savedChannelName);
+      sendToApi(code, savedApiUrl, savedWorkspaceId, savedChannelName, savedRedirectUri, signupSessionInfo);
     }
 
     window.addEventListener('message', onMessage);
@@ -526,10 +535,12 @@
     }, 500);
   }
 
-  function sendToApi(code, apiUrl, workspaceId, channelName) {
+  function sendToApi(code, apiUrl, workspaceId, channelName, redirectUri, sessionInfo) {
     setStep(3);
     setStatus('loading', 'Enviando code para sua API...');
     log('POST ' + apiUrl + '/channels/meta/official/connect', 'info');
+
+    sessionInfo = sessionInfo || {};
 
     fetch(apiUrl + '/channels/meta/official/connect', {
       method: 'POST',
@@ -537,7 +548,11 @@
       body: JSON.stringify({
         workspaceExternalId: workspaceId,
         name               : channelName,
-        code               : code
+        code               : code,
+        redirectUri        : redirectUri,
+        businessId         : sessionInfo.businessId || sessionInfo.business_id || null,
+        wabaId             : sessionInfo.wabaId || sessionInfo.waba_id || null,
+        phoneNumberId      : sessionInfo.phoneNumberId || sessionInfo.phone_number_id || null
       })
     })
     .then(function(res) {
@@ -561,6 +576,54 @@
       setStatus('error', 'Erro de rede');
       setStep(1);
     });
+  }
+
+  function parseEmbeddedSignupMessage(event) {
+    if (!isFacebookOrigin(event.origin)) return null;
+
+    var data = event.data;
+
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch(e) {
+        return null;
+      }
+    }
+
+    if (!data || data.type !== 'WA_EMBEDDED_SIGNUP') return null;
+
+    return data;
+  }
+
+  function handleEmbeddedSignupMessage(message) {
+    if (message.event === 'FINISH' || message.event === 'FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING') {
+      signupSessionInfo = message.data || {};
+      sessionStorage.setItem('oauth_signupInfo', JSON.stringify(signupSessionInfo));
+      log(
+        'Embedded Signup finalizado. businessId=' +
+          (signupSessionInfo.businessId || signupSessionInfo.business_id || '—') +
+          ', wabaId=' +
+          (signupSessionInfo.wabaId || signupSessionInfo.waba_id || '—') +
+          ', phoneNumberId=' +
+          (signupSessionInfo.phoneNumberId || signupSessionInfo.phone_number_id || '—'),
+        'success'
+      );
+      return;
+    }
+
+    if (message.event === 'ERROR') {
+      log('Erro Embedded Signup: ' + ((message.data && message.data.error_message) || 'erro desconhecido'), 'error');
+      return;
+    }
+
+    if (message.data && message.data.current_step) {
+      log('Embedded Signup interrompido em: ' + message.data.current_step, 'warn');
+    }
+  }
+
+  function isFacebookOrigin(origin) {
+    return origin === 'https://www.facebook.com' || origin === 'https://web.facebook.com';
   }
 
   function getVal(id) { return document.getElementById(id).value.trim(); }
